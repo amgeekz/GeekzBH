@@ -40,88 +40,9 @@ fun MainScreen() {
     var isConsoleExpanded by remember { mutableStateOf(false) }
     val logs by ShellUtils.shellLogs.collectAsState()
 
-    val batteryPercent by ChargingController.batteryLevel.collectAsState()
-    val isBypassActive by ChargingController.isBypassMode.collectAsState()
-    val batteryStatus by ChargingController.batteryStatus.collectAsState()
-
-    val isDeviceCharging = batteryStatus.lowercase().contains("charging") || 
-                           batteryStatus.lowercase().contains("boost") || 
-                           isBypassActive
-
-    // Infinite transition for pulsing animation when charging is active
-    val infiniteTransition = rememberInfiniteTransition(label = "battery_pulse")
-    val pulsingAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 1.0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse"
-    )
-
     Scaffold(
         topBar = {
             Column(modifier = Modifier.background(NeoBg)) {
-                // Simulated Android Status Bar (In line with Neobrutalist high contrast styling)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(34.dp)
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "02.35", // Locked aesthetic timestamp corresponding to the user's mockup image
-                        color = NeoDark,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Black,
-                        fontFamily = FontFamily.Monospace
-                    )
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Network Rate mockup
-                        Text(
-                            text = if (isBypassActive) "4,22 MB/s" else "0,14 MB/s",
-                            color = NeoDark,
-                            fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Black
-                        )
-                        
-                        // Wi-Fi details
-                        Text(
-                            text = "📶 WiFi", 
-                            color = NeoDark, 
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
-                        )
-
-                        // Battery Level glyph
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "$batteryPercent%",
-                                color = if (batteryPercent > 20) NeoDark else SoftRed,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Black,
-                                modifier = Modifier.graphicsLayer(alpha = if (isDeviceCharging) pulsingAlpha else 1.0f)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = if (isDeviceCharging) "⚡🔋" else "🔋",
-                                color = NeoDark,
-                                fontSize = 11.sp,
-                                modifier = Modifier.graphicsLayer(alpha = if (isDeviceCharging) pulsingAlpha else 1.0f)
-                            )
-                        }
-                    }
-                }
-
                 // Layout toolbar header
                 Row(
                     modifier = Modifier

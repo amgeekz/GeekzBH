@@ -281,6 +281,7 @@ fun SettingsDetailDialog(
                 isRunningTask = true
                 terminalRows = listOf("$ su -v", "Enquiring root bin availability...")
                 delay(500)
+                ShellUtils.checkRootPermission()
                 val isRoot = ShellUtils.isRootGranted.value
                 terminalRows = terminalRows + if (isRoot) {
                     listOf("SU binary found: /system/xbin/su", "Verifying root node permission...", "Inquiry result: ACCESS GRANTED", "System is fully ready.")

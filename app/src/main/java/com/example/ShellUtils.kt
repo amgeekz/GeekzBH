@@ -68,10 +68,11 @@ object ShellUtils {
     private fun readRealNode(nodeName: String): String {
         val nodePath = getRealNodePath(nodeName) ?: return ""
         val cmd = "cat $nodePath"
-        val result = executeCmdSync(cmd, useRoot = false)
-        if (result.isError) {
-            // Retry with root if normal read fails
-            val rootResult = executeCmdSync(cmd, useRoot = true)
+        val useRoot = _isRootGranted.value
+        val result = executeCmdSync(cmd, useRoot = useRoot, logToConsole = false)
+        if (result.isError && !useRoot) {
+            // Retry with root if normal read fails and we hadn't already tried it as root
+            val rootResult = executeCmdSync(cmd, useRoot = true, logToConsole = false)
             return rootResult.output.trim()
         }
         return result.output.trim()
@@ -107,7 +108,7 @@ object ShellUtils {
         return possiblePaths.firstOrNull()
     }
 
-    fun executeCmdSync(command: String, useRoot: Boolean = true): CommandResult {
+    fun executeCmdSync(command: String, useRoot: Boolean = true, logToConsole: Boolean = true): CommandResult {
         val output = StringBuilder()
         var isError = false
         try {
@@ -142,6 +143,12 @@ object ShellUtils {
                 if (errorOutput.isNotEmpty()) {
                     output.appendLine("Error Output: $errorOutput")
                 }
+            } else {
+                // Self-healing check: if command was executed with root and succeeded,
+                // we can confirm root is granted and update the state.
+                if (useRoot && !_isRootGranted.value) {
+                    _isRootGranted.value = true
+                }
             }
         } catch (e: Exception) {
             isError = true
@@ -149,7 +156,11 @@ object ShellUtils {
         }
         
         val result = CommandResult(command, output.toString(), isError)
-        logCommand(result, useRoot)
+        if (logToConsole) {
+            logCommand(result, useRoot)
+        } else {
+            Log.d(TAG, "[${if (useRoot) "ROOT" else "SH"}] (NoConsoleLog) Cmd: ${result.command} -> Success: ${!result.isError}")
+        }
         return result
     }
 
