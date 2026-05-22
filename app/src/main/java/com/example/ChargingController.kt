@@ -21,13 +21,13 @@ object ChargingController {
     private val _isServiceActive = MutableStateFlow(true)
     val isServiceActive = _isServiceActive.asStateFlow()
 
-    private val _chargingLimit = MutableStateFlow(80) // default limit 80% to preserve lifespan
+    private val _chargingLimit = MutableStateFlow(100) // default limit 100% as requested
     val chargingLimit = _chargingLimit.asStateFlow()
 
     private val _isBypassMode = MutableStateFlow(false)
     val isBypassMode = _isBypassMode.asStateFlow()
 
-    private val _thermalCutoffEnabled = MutableStateFlow(true)
+    private val _thermalCutoffEnabled = MutableStateFlow(false) // default off as requested
     val thermalCutoffEnabled = _thermalCutoffEnabled.asStateFlow()
 
     private val _cpuPowerSaveEnabled = MutableStateFlow(false)
