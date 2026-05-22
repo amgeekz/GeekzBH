@@ -16,12 +16,9 @@ object ShellUtils {
     private val _shellLogs = MutableStateFlow<List<LogEntry>>(emptyList())
     val shellLogs = _shellLogs.asStateFlow()
 
-    // Mode indicator: true = simulated (mock nodes), false = attempts real root
-    private val _isSimulatedMode = MutableStateFlow(true)
-    val isSimulatedMode = _isSimulatedMode.asStateFlow()
-
-    // Real vs Simulated paths
-    private var simulatedDir: File? = null
+    // Mode indicator: true = root granted, false = root not granted
+    private val _isRootGranted = MutableStateFlow(false)
+    val isRootGranted = _isRootGranted.asStateFlow()
 
     data class LogEntry(
         val timestamp: Long,
@@ -32,24 +29,18 @@ object ShellUtils {
     )
 
     fun initialize(context: Context) {
-        simulatedDir = File(context.filesDir, "sys_mock").apply {
-            if (!exists()) {
-                mkdirs()
-            }
-        }
-        // Initialize simulated sysfs files if they don't exist
-        setupSimulatedFiles()
-        
-        // Detect if root helper actually exists (su binary)
-        val hasSu = checkSuBinary()
-        _isSimulatedMode.value = !hasSu
-        
-        logLocal("System", "Service Initialized. Root found: $hasSu. Simulated Mode default: ${_isSimulatedMode.value}", false)
+        checkRootPermission()
+        logLocal("System", "LimitlessCharge Initialized. Root access: ${_isRootGranted.value}", false)
     }
 
-    fun setSimulatedMode(enabled: Boolean) {
-        _isSimulatedMode.value = enabled
-        logLocal("System", "Operational mode toggled: " + if (enabled) "SIMULATOR (Sandbox)" else "REAL SYSTEM ROOT", false)
+    fun checkRootPermission() {
+        val hasSu = checkSuBinary()
+        if (hasSu) {
+            val result = executeCmdSync("id", useRoot = true)
+            _isRootGranted.value = !result.isError && result.output.contains("uid=0")
+        } else {
+            _isRootGranted.value = false
+        }
     }
 
     private fun checkSuBinary(): Boolean {
@@ -65,60 +56,13 @@ object ShellUtils {
         }
     }
 
-    private fun setupSimulatedFiles() {
-        val dir = simulatedDir ?: return
-        
-        // Setup battery nodes structure
-        writeSimulatedFile("charging_enabled", "1")
-        writeSimulatedFile("input_suspend", "0")
-        writeSimulatedFile("charge_control_limit_max", "100")
-        
-        // Read-only battery info nodes
-        writeSimulatedFile("capacity", "47")
-        writeSimulatedFile("temp", "479") // 47.9°C
-        writeSimulatedFile("current_now", "2380000") // 2380mA in uA
-        writeSimulatedFile("voltage_now", "4313000") // 4313mV in uV
-        writeSimulatedFile("health", "Good")
-        writeSimulatedFile("technology", "Li-poly")
-        writeSimulatedFile("status", "Charging")
-        writeSimulatedFile("cycle_count", "2079")
-    }
-
     fun readNodeValue(nodeName: String): String {
-        return if (_isSimulatedMode.value) {
-            readSimulatedFile(nodeName)
-        } else {
-            readRealNode(nodeName)
-        }
+        return readRealNode(nodeName)
     }
 
     fun writeNodeValue(nodeName: String, value: String): Boolean {
         logLocal("SYSFS_WRITE", "Writing node [$nodeName] -> value [$value]", false)
-        return if (_isSimulatedMode.value) {
-            writeSimulatedFile(nodeName, value)
-            true
-        } else {
-            writeRealNode(nodeName, value)
-        }
-    }
-
-    private fun readSimulatedFile(fileName: String): String {
-        val file = File(simulatedDir, fileName)
-        if (!file.exists()) return ""
-        return try {
-            file.readText().trim()
-        } catch (e: Exception) {
-            ""
-        }
-    }
-
-    private fun writeSimulatedFile(fileName: String, content: String) {
-        val file = File(simulatedDir, fileName)
-        try {
-            file.writeText(content)
-        } catch (e: Exception) {
-            Log.e(TAG, "Fail to write simulated file $fileName", e)
-        }
+        return writeRealNode(nodeName, value)
     }
 
     private fun readRealNode(nodeName: String): String {

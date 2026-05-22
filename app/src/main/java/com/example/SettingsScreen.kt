@@ -3,6 +3,7 @@ package com.example
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -25,9 +26,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen() {
-    val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
-
     var activeDialogType by remember { mutableStateOf<SettingsDialog?>(null) }
 
     val thermalCutoff by ChargingController.thermalCutoffEnabled.collectAsState()
@@ -36,15 +35,15 @@ fun SettingsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(AmoledBlack)
+            .background(NeoBg)
             .verticalScroll(scrollState)
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         
         // --- SECTION 1: PROTEKSI ---
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SectionHeader(title = "PROTEKSI")
+            SectionHeader(title = "PROTEKSI KESEHATAN")
             
             SettingsSwitchRow(
                 title = "Thermal Cut-off",
@@ -56,7 +55,7 @@ fun SettingsScreen() {
 
         // --- SECTION 2: HARDWARE ---
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SectionHeader(title = "HARDWARE")
+            SectionHeader(title = "KONTROL HARDWARE")
 
             SettingsSwitchRow(
                 title = "CPU Power Save",
@@ -68,7 +67,7 @@ fun SettingsScreen() {
 
         // --- SECTION 3: SISTEM ---
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SectionHeader(title = "SISTEM")
+            SectionHeader(title = "FUNGSI UTAMA SISTEM")
 
             SettingsActionRow(
                 title = "Kalibrasi Baterai",
@@ -83,25 +82,25 @@ fun SettingsScreen() {
             )
 
             SettingsActionRow(
-                title = "Akses Izin",
-                subtitle = "Memberikan izin tulis ke node sistem",
+                title = "Akses Izin Root",
+                subtitle = "Cek apakah izin root superuser tersedia",
                 onClick = { activeDialogType = SettingsDialog.PermissionAccess }
             )
         }
 
         // --- SECTION 4: INFORMASI ---
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SectionHeader(title = "INFORMASI")
+            SectionHeader(title = "INFORMASI & DIAGNOSTIK")
 
             SettingsActionRow(
                 title = "Cek Node Aktif",
-                subtitle = "Deteksi node charging yang tersedia di device",
+                subtitle = "Deteksi ketersediaan node hardware Charging",
                 onClick = { activeDialogType = SettingsDialog.CheckActiveNodes }
             )
 
             SettingsActionRow(
                 title = "Tentang Aplikasi",
-                subtitle = "Informasi versi dan pengembang",
+                subtitle = "Developer, lisensi, dan informasi versi",
                 onClick = { activeDialogType = SettingsDialog.AboutApp }
             )
         }
@@ -130,11 +129,12 @@ enum class SettingsDialog {
 fun SectionHeader(title: String) {
     Text(
         text = title,
-        color = NeonGreen,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Bold,
-        letterSpacing = 1.2.sp,
-        modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+        color = NeoDark,
+        fontSize = 11.sp,
+        fontFamily = FontFamily.Monospace,
+        fontWeight = FontWeight.Black,
+        letterSpacing = 1.sp,
+        modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
     )
 }
 
@@ -145,11 +145,10 @@ fun SettingsSwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Card(
+    NeobrutalistCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = DarkCharcoal),
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Color(0xFF1E293B))
+        containerColor = if (checked) NeoPink.copy(alpha = 0.08f) else NeoWhite,
+        shadowOffset = 3.dp
     ) {
         Row(
             modifier = Modifier
@@ -161,14 +160,14 @@ fun SettingsSwitchRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    color = TextPrimary,
+                    color = NeoDark,
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Black
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = subtitle,
-                    color = TextSecondary,
+                    color = NeoSubtitle,
                     fontSize = 12.sp,
                     lineHeight = 16.sp
                 )
@@ -178,10 +177,10 @@ fun SettingsSwitchRow(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = AmoledBlack,
-                    checkedTrackColor = NeonGreen,
-                    uncheckedThumbColor = TextSecondary,
-                    uncheckedTrackColor = LightCharcoal
+                    checkedThumbColor = NeoWhite,
+                    checkedTrackColor = NeoDark,
+                    uncheckedThumbColor = NeoSubtitle,
+                    uncheckedTrackColor = Color(0xFFE2E8F0)
                 )
             )
         }
@@ -194,13 +193,11 @@ fun SettingsActionRow(
     subtitle: String,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = DarkCharcoal),
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Color(0xFF1E293B))
+    NeobrutalistCard(
+        modifier = Modifier.fillMaxWidth(),
+        containerColor = NeoWhite,
+        shadowOffset = 3.dp,
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -212,15 +209,15 @@ fun SettingsActionRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    color = TextPrimary,
+                    color = NeoDark,
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Black
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = subtitle,
-                    color = TextSecondary,
-                    fontSize = 12.sp
+                    color = NeoSubtitle,
+                    fontSize = 11.sp
                 )
             }
 
@@ -233,9 +230,9 @@ fun SettingsActionRow(
                 }
                 drawPath(
                     path = path,
-                    color = TextSecondary,
+                    color = NeoDark,
                     style = androidx.compose.ui.graphics.drawscope.Stroke(
-                        width = 4f,
+                        width = 3.dp.toPx(),
                         cap = androidx.compose.ui.graphics.StrokeCap.Round,
                         join = androidx.compose.ui.graphics.StrokeJoin.Round
                     )
@@ -250,7 +247,6 @@ fun SettingsDetailDialog(
     dialogType: SettingsDialog,
     onDismiss: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     var terminalRows by remember { mutableStateOf<List<String>>(emptyList()) }
     var isRunningTask by remember { mutableStateOf(false) }
 
@@ -285,11 +281,11 @@ fun SettingsDetailDialog(
                 isRunningTask = true
                 terminalRows = listOf("$ su -v", "Enquiring root bin availability...")
                 delay(500)
-                val isSimulated = ShellUtils.isSimulatedMode.value
-                terminalRows = terminalRows + if (!isSimulated) {
-                    listOf("SU binary found: /system/xbin/su", "Verifying write nodes accessibility...", "Access granted! Root node manipulation functional.")
+                val isRoot = ShellUtils.isRootGranted.value
+                terminalRows = terminalRows + if (isRoot) {
+                    listOf("SU binary found: /system/xbin/su", "Verifying root node permission...", "Inquiry result: ACCESS GRANTED", "System is fully ready.")
                 } else {
-                    listOf("SU binary not responding / Device not rooted.", "Setting write nodes to sandboxed storage.", "Sandbox virtual engine: WRITABLE / ACTIVE.")
+                    listOf("SU binary not responding / Device not rooted.", "Inquiry result: ACCESS DENIED", "LimitlessCharge running in diagnostic telemetry mode.")
                 }
                 isRunningTask = false
             }
@@ -300,11 +296,14 @@ fun SettingsDetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = onDismiss,
-                colors = ButtonDefaults.textButtonColors(contentColor = NeonGreen)
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(2.dp, NeoDark),
+                colors = ButtonDefaults.buttonColors(containerColor = NeoDark, contentColor = NeoWhite)
             ) {
-                Text(text = "Tutup", fontWeight = FontWeight.Bold)
+                Text(text = "Tutup", fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
             }
         },
         title = {
@@ -316,33 +315,34 @@ fun SettingsDetailDialog(
                     SettingsDialog.CheckActiveNodes -> "Identifikasi Node Unit"
                     SettingsDialog.AboutApp -> "Tentang Aplikasi"
                 },
-                color = TextPrimary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                color = NeoDark,
+                fontWeight = FontWeight.Black,
+                fontSize = 18.sp
             )
         },
         text = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 4.dp)
             ) {
                 if (dialogType == SettingsDialog.BatteryCalibration || 
                     dialogType == SettingsDialog.RestartDaemon || 
                     dialogType == SettingsDialog.PermissionAccess
                 ) {
-                    // Terminal display styling
+                    // Terminal display styling (Neobrutalist Console Box)
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(180.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF0C0C0D))
+                            .border(BorderStroke(2.5.dp, NeoDark), shape = RoundedCornerShape(10.dp))
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFF0F1115))
                             .padding(12.dp)
                     ) {
                         Text(
                             text = "ROOT SHELL CONSOLE",
-                            color = TextSecondary,
+                            color = NeoSubtitle.copy(alpha = 0.8f),
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace,
@@ -357,8 +357,8 @@ fun SettingsDetailDialog(
                                 terminalRows.forEach { row ->
                                     Text(
                                         text = row,
-                                        color = if (row.startsWith("Error") || row.startsWith("WARNING")) SoftRed else if (row.startsWith("SUCCESS") || row.startsWith("Permission granted!")) NeonGreen else TextPrimary,
-                                        fontSize = 12.sp,
+                                        color = if (row.startsWith("Error") || row.startsWith("WARNING") || row.startsWith("Inquiry result: ACCESS DENIED")) SoftRed else if (row.startsWith("SUCCESS") || row.startsWith("Permission granted!") || row.contains("ACCESS GRANTED")) NeoGreen else NeoWhite,
+                                        fontSize = 11.sp,
                                         fontFamily = FontFamily.Monospace
                                     )
                                 }
@@ -366,9 +366,9 @@ fun SettingsDetailDialog(
                             if (isRunningTask) {
                                 CircularProgressIndicator(
                                     modifier = Modifier
-                                        .size(20.dp)
+                                        .size(16.dp)
                                         .align(Alignment.BottomEnd),
-                                    color = NeonGreen,
+                                    color = NeoPink,
                                     strokeWidth = 2.dp
                                 )
                             }
@@ -377,52 +377,53 @@ fun SettingsDetailDialog(
                 } else if (dialogType == SettingsDialog.CheckActiveNodes) {
                     // Node identification summary list
                     val nodes = listOf(
-                        "/sys/class/power_supply/battery/charging_enabled" to "Writable Control (0/1)",
-                        "/sys/class/power_supply/battery/input_suspend" to "Alternative Charger Stop (0/1)",
-                        "/sys/class/power_supply/battery/charge_control_limit_max" to "Hardware percentage setting (50-100)",
-                        "/sys/class/power_supply/battery/status" to "Readable Power supply mode (Charging/Bypass)",
-                        "/sys/class/power_supply/battery/capacity" to "Current Battery Capacity percentage"
+                        "charging_enabled" to "Writable Control (0/1)",
+                        "input_suspend" to "Alternative Charger Stop (0/1)",
+                        "charge_control_limit_max" to "Hardware percentage limit (50-100)",
+                        "status" to "Readable Power supply mode (Charging/Bypass)",
+                        "capacity" to "Current Battery Capacity percentage"
                     )
 
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            text = "Berikut daftar status kesiapan node hardware device Anda:",
-                            color = TextSecondary,
-                            fontSize = 13.sp,
-                            lineHeight = 18.sp
+                            text = "Daftar status kesiapan node hardware device Anda:",
+                            color = NeoSubtitle,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
                         )
                         
-                        nodes.forEach { (path, desc) ->
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFF0C0C0D)),
-                                shape = RoundedCornerShape(8.dp),
+                        nodes.forEach { (nodeName, desc) ->
+                            NeobrutalistCard(
+                                containerColor = NeoWhite,
+                                shadowOffset = 2.dp,
+                                borderWidth = 1.5.dp,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
                                     modifier = Modifier.padding(10.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // Status icon
                                     Box(
                                         modifier = Modifier
                                             .size(8.dp)
                                             .clip(RoundedCornerShape(50))
-                                            .background(NeonGreen)
+                                            .background(NeoGreen)
+                                            .border(BorderStroke(1.dp, NeoDark), shape = RoundedCornerShape(50))
                                     )
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column {
                                         Text(
-                                            text = path.split("/").last(),
-                                            color = TextPrimary,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Bold,
+                                            text = nodeName,
+                                            color = NeoDark,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Black,
                                             fontFamily = FontFamily.Monospace
                                         )
                                         Text(
                                             text = desc,
-                                            color = TextSecondary,
+                                            color = NeoSubtitle,
                                             fontSize = 11.sp
                                         )
                                     }
@@ -434,36 +435,45 @@ fun SettingsDetailDialog(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         
-                        // App Logo Drawing
-                        Box(
-                            modifier = Modifier
-                                .size(72.dp)
-                                .clip(RoundedCornerShape(18.dp))
-                                .background(DarkCharcoal),
-                            contentAlignment = Alignment.Center
+                        // App Logo Drawing (Neobrutalist box format)
+                        NeobrutalistCard(
+                            modifier = Modifier.size(72.dp),
+                            containerColor = NeoYellow,
+                            borderWidth = 2.5.dp,
+                            shadowOffset = 4.dp
                         ) {
-                            Text(text = "🔌", fontSize = 36.sp)
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                Text(text = "🔌", fontSize = 34.sp)
+                            }
                         }
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = "LimitlessCharge",
-                                color = TextPrimary,
+                                color = NeoDark,
                                 fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Black
                             )
                             Text(
                                 text = "Versi 1.0.0 (Build 2026)",
-                                color = TextSecondary,
-                                fontSize = 13.sp
+                                color = NeoSubtitle,
+                                fontSize = 12.sp
                             )
                         }
 
-                        HorizontalDivider(color = DividerGray, thickness = 1.dp)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(2.dp)
+                                .background(NeoDark)
+                        )
 
                         Column(
                             modifier = Modifier.fillMaxWidth(),
@@ -473,31 +483,32 @@ fun SettingsDetailDialog(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "Pengembang", color = TextSecondary, fontSize = 13.sp)
-                                Text(text = "VoltByte Dev Team", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                                Text(text = "Pengembang", color = NeoSubtitle, fontSize = 12.sp)
+                                Text(text = "VoltByte Dev Team", color = NeoDark, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "Hubungi", color = TextSecondary, fontSize = 13.sp)
-                                Text(text = "bolehakutaunomormu@gmail.com", color = NeonGreen, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                Text(text = "Hubungi", color = NeoSubtitle, fontSize = 12.sp)
+                                Text(text = "bolehakutaunomormu@gmail.com", color = NeoDark, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "Keamanan", color = TextSecondary, fontSize = 13.sp)
-                                Text(text = "Kompabilitas Knox & SELinux", color = TextPrimary, fontSize = 12.sp)
+                                Text(text = "Kompabilitas", color = NeoSubtitle, fontSize = 12.sp)
+                                Text(text = "Direct Kernel SysFS Nodes", color = NeoDark, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
                 }
             }
         },
-        containerColor = DarkCharcoal,
-        shape = RoundedCornerShape(24.dp)
+        containerColor = NeoWhite,
+        modifier = Modifier.border(BorderStroke(3.dp, NeoDark), shape = RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp)
     )
 }

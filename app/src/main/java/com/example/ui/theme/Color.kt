@@ -2,25 +2,28 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Neobrutalist stark comic palette
+val NeoBg = Color(0xFFFBF7EE)        // Soft sand/cream background
+val NeoWhite = Color(0xFFFFFFFF)     // Card background
+val NeoDark = Color(0xFF0C0E11)      // Accent dark and borders
+val NeoPink = Color(0xFFFF92B8)      // Bubblegum Pink for active buttons/accents
+val NeoYellow = Color(0xFFFEF2CF)    // Rich warning box/disclaimer
+val NeoGreen = Color(0xFF10B981)     // Vivid charging/Success green
+val NeoOrange = Color(0xFFF59E0B)    // Vivid orange
+val NeoCyan = Color(0xFF06B6D4)      // High voltage boost tech cyan
+val NeoSubtitle = Color(0xFF475569)  // High-contrast slate subtitle
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-// Immersive UI custom technological palette (Space Deep Black + Tech Cyan Glow)
-val AmoledBlack = Color(0xFF05070A)
-val DarkCharcoal = Color(0xFF0F172A)
-val LightCharcoal = Color(0xFF1E293B)
-val NeonGreen = Color(0xFF06B6D4) // Swapped to high tech Cyan!
-val GlowCyan = Color(0xFF06B6D4)
-val TechGreen = Color(0xFF22C55E)
+// Map standard theme tokens for compatibility & fast transformation
+val AmoledBlack = NeoBg
+val DarkCharcoal = NeoWhite
+val LightCharcoal = Color(0xFFFAF2E4)
+val NeonGreen = NeoPink
+val GlowCyan = NeoPink
+val TechGreen = NeoGreen
 val SoftRed = Color(0xFFEF4444)
-val TextPrimary = Color(0xFFFFFFFF)
-val TextSecondary = Color(0xFF64748B) // Slate 500
-val DividerGray = Color(0xFF1E293B) // Slate 800
-val LightBlue = Color(0xFF06B6D4)
-val TechBypassBg = Color(0xFF083344)
-val TechBypassBorder = Color(0xFF22D3EE)
+val TextPrimary = NeoDark
+val TextSecondary = NeoSubtitle
+val DividerGray = NeoDark
+val LightBlue = NeoCyan
+val TechBypassBg = Color(0xFFFFF1F4)
+val TechBypassBorder = NeoPink
