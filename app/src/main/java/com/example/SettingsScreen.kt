@@ -451,7 +451,7 @@ fun SettingsDetailDialog(
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Root Charge Control",
+                                text = "LimitlessCharge",
                                 color = TextPrimary,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold

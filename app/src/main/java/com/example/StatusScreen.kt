@@ -283,9 +283,9 @@ fun BatteryLiquidGauge(level: Int, modifier: Modifier = Modifier) {
                 letterSpacing = (-1.5).sp
             )
             Spacer(modifier = Modifier.height(4.dp))
-            val isChargingBypassed = status == "Bypass Power"
+            val isChargingBypassed = status.contains("Bypass", ignoreCase = true) || status.contains("Boost", ignoreCase = true)
             Text(
-                text = if (isChargingBypassed) "ACTIVE BYPASS" else "PLUGGED IN (AC)",
+                text = if (isChargingBypassed) "ACTIVE BOOST BYPASS" else "PLUGGED IN (AC)",
                 color = if (isChargingBypassed) GlowCyan else TechGreen,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,

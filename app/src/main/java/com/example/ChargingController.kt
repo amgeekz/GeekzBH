@@ -163,17 +163,23 @@ object ChargingController {
 
         // Logic check
         if (bypass) {
-            // Bypass Mode IS FORCED ON: Suspend drawing juice into battery, device runs off charger
-            ShellUtils.writeNodeValue("charging_enabled", "0")
-            ShellUtils.writeNodeValue("input_suspend", "1")
+            // Bypass Mode IS FORCED ON: Override the max charge current to 4000mA and bypass thermal throttling limits!
+            ShellUtils.writeNodeValue("charging_enabled", "1")
+            ShellUtils.writeNodeValue("input_suspend", "0")
+            ShellUtils.writeNodeValue("fast_charge", "1")
+            ShellUtils.writeNodeValue("charge_current_max", "4000000") // 4000mA (Bypass)
         } else {
-            // Evaluated limit
+            // Bypass Mode disabled: Restore standard current limits
+            ShellUtils.writeNodeValue("fast_charge", "0")
+            ShellUtils.writeNodeValue("charge_current_max", "2840000") // 2840mA (Standard)
+
+            // Evaluated limit checkpoint
             if (level >= limit) {
                 // Limit reached. Suspend charging (act like bypass mode is engaged automatically at limit)
                 ShellUtils.writeNodeValue("charging_enabled", "0")
                 ShellUtils.writeNodeValue("input_suspend", "1")
-            } else if (level <= (limit - 5).coerceAtLeast(30)) {
-                // Lower recharging offset boundary reached. Turn charging back ON to top-up battery
+            } else {
+                // If it's below limit, make sure standard charging is active! (Fixes non-responsive OFF button bug)
                 ShellUtils.writeNodeValue("charging_enabled", "1")
                 ShellUtils.writeNodeValue("input_suspend", "0")
             }
@@ -196,36 +202,46 @@ object ChargingController {
                                ShellUtils.readNodeValue("input_suspend") == "0"
 
             if (chargingInNode) {
-                // Simulating charging
-                statusStr = "Charging"
-                if (level < 100) {
-                    // Increase mock battery percentage over time
-                    if (Math.random() < 0.15) {
-                        level += 1
+                if (bypass) {
+                    statusStr = "Bypass Mode Boost"
+                    if (level < 100) {
+                        // Increase mock battery percentage slightly faster because of fast bypass charge
+                        if (Math.random() < 0.23) {
+                            level += 1
+                        }
                     }
-                }
-                
-                // Set charge currents
-                current = if (level > 85) 950 else 2380
-                voltage = 3700 + (level * 8)
-                
-                // Slow temp rise during charge
-                if (temp < 43.5f) {
-                    temp += 0.05f
+                    // Current is boosted to bypassed limit (4000mA range)
+                    current = (3950..4210).random()
+                    voltage = 3700 + (level * 8)
+                    if (temp < 46.5f) {
+                        temp += 0.12f
+                    }
+                } else {
+                    // Simulating normal charging
+                    statusStr = "Charging"
+                    if (level < 100) {
+                        // Increase mock battery percentage over time
+                        if (Math.random() < 0.15) {
+                            level += 1
+                        }
+                    }
+                    
+                    // Set standard charge currents
+                    current = if (level > 85) 950 else 2380
+                    voltage = 3700 + (level * 8)
+                    
+                    // Slow temp rise during charge
+                    if (temp < 43.5f) {
+                        temp += 0.05f
+                    }
                 }
             } else {
                 // Charging is suspended (either bypass active or limit reached)
                 if (level >= limit) {
-                    statusStr = "Bypass Power"
+                    statusStr = "Limit Suspended"
                     current = 0 // charger powers mainboard, battery is idle
                     if (temp > 34.0f) {
                         temp -= 0.1f // cool down since battery is not charging
-                    }
-                } else if (bypass) {
-                    statusStr = "Bypass Power"
-                    current = 0
-                    if (temp > 34.0f) {
-                        temp -= 0.1f
                     }
                 } else {
                     // Standard discharging

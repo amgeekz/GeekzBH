@@ -47,7 +47,7 @@ jobs:
       with:
         files: app/build/outputs/apk/debug/app-debug.apk
         tag_name: v${{ github.run_number }}
-        name: Root Charge Control v${{ github.run_number }}
+        name: LimitlessCharge v${{ github.run_number }}
         draft: true
         prerelease: false
       env:

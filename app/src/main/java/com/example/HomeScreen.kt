@@ -175,8 +175,7 @@ fun HomeScreen() {
         }
 
         // 3. Bypass Mode Control Card
-        val isChargingSuspended = (currentBattery >= limit && serviceActive) || bypassMode
-        val bypassBorder = if (isChargingSuspended) {
+        val bypassBorder = if (bypassMode) {
             BorderStroke(1.5.dp, GlowCyan.copy(alpha = 0.8f))
         } else {
             BorderStroke(1.dp, Color(0xFF1E293B))
@@ -185,7 +184,7 @@ fun HomeScreen() {
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = if (isChargingSuspended) TechBypassBg.copy(alpha = 0.35f) else DarkCharcoal
+                containerColor = if (bypassMode) TechBypassBg.copy(alpha = 0.35f) else DarkCharcoal
             ),
             shape = RoundedCornerShape(20.dp),
             border = bypassBorder
@@ -196,7 +195,7 @@ fun HomeScreen() {
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "MOTHERBOARD BYPASS MODULE",
+                    text = "CHARGER LIMITS BYPASS MOD",
                     color = TextSecondary,
                     fontSize = 10.sp,
                     fontFamily = FontFamily.Monospace,
@@ -205,16 +204,16 @@ fun HomeScreen() {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                val displayStatus = if (isChargingSuspended) {
-                    "ACTIVE (AC Direct Motherboard Power Delivery)"
+                val displayStatus = if (bypassMode) {
+                    "ACTIVE (Bypassing charging throttle limit. Target: 4000mA)"
                 } else {
-                    "STANDBY (Inflow directed through battery cells)"
+                    "STANDBY (Standard charging throttle active: Max 2840mA)"
                 }
 
                 Text(
                     text = "STATUS: $displayStatus",
-                    color = if (isChargingSuspended) TechBypassBorder else TextSecondary,
-                    fontSize = 12.sp,
+                    color = if (bypassMode) TechBypassBorder else TextSecondary,
+                    fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold
                 )
