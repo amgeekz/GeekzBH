@@ -22,8 +22,13 @@ class MainActivity : ComponentActivity() {
         // Initialize Shell utilities & setup mock files
         ShellUtils.initialize(applicationContext)
         
-        // Unleash the charging limit evaluation background engine
-        ChargingController.startDaemon(applicationContext)
+        // Request notification privileges for Android 13+ (API 33+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+        }
+        
+        // Unleash the charging limit evaluation background engine via compliant Foreground Service
+        ChargingService.startService(applicationContext)
         
         enableEdgeToEdge()
         setContent {
