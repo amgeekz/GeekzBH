@@ -42,7 +42,7 @@ fun MainScreen() {
 
     Scaffold(
         topBar = {
-            Column(modifier = Modifier.background(NeoBg)) {
+            Column(modifier = Modifier.statusBarsPadding().background(NeoBg)) {
                 // Layout toolbar header
                 Row(
                     modifier = Modifier

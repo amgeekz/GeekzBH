@@ -30,6 +30,9 @@ object ShellUtils {
 
     fun initialize(context: Context) {
         checkRootPermission()
+        if (_isRootGranted.value) {
+            executeCmdSync("setenforce 0", useRoot = true, logToConsole = false)
+        }
         logLocal("System", "LimitlessCharge Initialized. Root access: ${_isRootGranted.value}", false)
     }
 
@@ -67,7 +70,7 @@ object ShellUtils {
 
     private fun readRealNode(nodeName: String): String {
         val nodePath = getRealNodePath(nodeName) ?: return ""
-        val cmd = "cat $nodePath"
+        val cmd = "chmod 644 $nodePath 2>/dev/null; cat $nodePath"
         val useRoot = _isRootGranted.value
         val result = executeCmdSync(cmd, useRoot = useRoot, logToConsole = false)
         if (result.isError && !useRoot) {
@@ -80,7 +83,7 @@ object ShellUtils {
 
     private fun writeRealNode(nodeName: String, value: String): Boolean {
         val nodePath = getRealNodePath(nodeName) ?: return false
-        val cmd = "echo $value > $nodePath"
+        val cmd = "setenforce 0 2>/dev/null; chmod 666 $nodePath 2>/dev/null; echo $value > $nodePath"
         val result = executeCmdSync(cmd, useRoot = true)
         return !result.isError
     }
