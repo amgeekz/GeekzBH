@@ -1,30 +1,80 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:endX="85.84757"
-                android:endY="92.4963"
-                android:startX="42.9492"
-                android:startY="49.59793"
-                android:type="linear">
-                <item
-                    android:color="#44000000"
-                    android:offset="0.0" />
-                <item
-                    android:color="#00000000"
-                    android:offset="1.0" />
-            </gradient>
-        </aapt:attr>
-    </path>
+
+    <!-- Dark Slate Background Circle simulating a premium look -->
     <path
-        android:fillColor="#FFFFFF"
-        android:fillType="nonZero"
-        android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
-        android:strokeWidth="1"
-        android:strokeColor="#00000000" />
+        android:fillColor="#1e293b"
+        android:pathData="M54,12C30.8,12 12,30.8 12,54C12,77.2 30.8,96 54,96C77.2,96 96,77.2 96,54C96,30.8 77.2,12 54,12Z" />
+
+    <!-- Plus sign 1 (larger top right) -->
+    <path
+        android:fillColor="#fbbf24"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="1.5"
+        android:pathData="M69,30 h6 v-6 h2 v6 h6 v2 h-6 v6 h-2 v-6 h-6 Z" />
+
+    <!-- Plus sign 2 (smaller top right) -->
+    <path
+        android:fillColor="#fbbf24"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="1.2"
+        android:pathData="M81,42 h4 v-4 h1.5 v4 h4 v1.5 h-4 v4 h-1.5 v-4 h-4 Z" />
+
+    <!-- Battery Top Cap -->
+    <path
+        android:fillColor="#0f172a"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="1.6"
+        android:pathData="M43,26 h14 c1.5,0 2.5,1 2.5,2.5 v2.5 h-19 v-2.5 c0,-1.5 1,-2.5 2.5,-2.5 Z" />
+
+    <!-- Battery main body outline and white/gray body fill -->
+    <path
+        android:fillColor="#e2e8f0"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="2.5"
+        android:pathData="M34,31 h32 a4,4 0,0,1 4,4 v46 a4,4 0,0,1 -4,4 h-32 a4,4 0,0,1 -4,-4 v-46 a4,4 0,0,1 4,-4 Z" />
+
+    <!-- Battery green energy level at the bottom -->
+    <path
+        android:fillColor="#10b981"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="2.2"
+        android:pathData="M33,61 h34 v20 a2,2 0,0,1 -2,2 h-30 a2,2 0,0,1 -2,-2 Z" />
+
+    <!-- Bright yellow Bold Lightning Bolt inside battery -->
+    <path
+        android:fillColor="#fbbf24"
+        android:strokeColor="#0f1712"
+        android:strokeWidth="1.6"
+        android:pathData="M52,35 L40,51 L48,51 L44,61 L56,45 L48,45 Z" />
+
+    <!-- Large overlap Clock (Mustard yellow circular) -->
+    <path
+        android:fillColor="#f59e0b"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="2.5"
+        android:pathData="M68,52 A17,17 0,1,1 68,86 A17,17 0,1,1 68,52 Z" />
+
+    <!-- Clock Center White Pin -->
+    <path
+        android:fillColor="#ffffff"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="1.5"
+        android:pathData="M68,66 A3,3 0,1,1 68,72 A3,3 0,1,1 68,66 Z" />
+
+    <!-- Clock Hour Hand (Pointing roughly down-to-right) -->
+    <path
+        android:strokeColor="#0f172a"
+        android:strokeWidth="2.5"
+        android:pathData="M68,69 L76,75" />
+
+    <!-- Clock Minute Hand (Pointing vertical up) -->
+    <path
+        android:strokeColor="#0f172a"
+        android:strokeWidth="2.5"
+        android:pathData="M68,69 L68,58" />
+
 </vector>
