@@ -120,21 +120,7 @@ dependencies {
   "ksp"(libs.moshi.kotlin.codegen)
 }
 
-tasks.register("createMipmaps") {
-    doLast {
-        val srcFile = file("src/main/res/drawable/app_icon.png")
-        if (srcFile.exists()) {
-            val densities = listOf("mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi")
-            densities.forEach { d ->
-                val destDir = file("src/main/res/mipmap-$d")
-                destDir.mkdirs()
-                srcFile.copyTo(File(destDir, "ic_launcher.png"), overwrite = true)
-                srcFile.copyTo(File(destDir, "ic_launcher_round.png"), overwrite = true)
-            }
-            logger.lifecycle("COPIED APP ICON TO ALL MIPMAP DENSITIES SUCCESSFULLY!")
-        } else {
-            logger.error("SOURCE APP_ICON.PNG NOT FOUND")
-        }
-    }
-}
+
+
+
 

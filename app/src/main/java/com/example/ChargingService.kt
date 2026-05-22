@@ -126,7 +126,7 @@ class ChargingService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(content)
-            .setSmallIcon(R.drawable.app_icon) // Using the pristine drawable/app_icon as requested!
+            .setSmallIcon(R.drawable.ic_charging_notification) // Monochrome vector suitable for status bar
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
