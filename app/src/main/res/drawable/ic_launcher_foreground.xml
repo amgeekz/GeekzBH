@@ -1,80 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Dark Slate Background Circle simulating a premium look -->
+    
+    <!-- Outer Battery Outline -->
     <path
-        android:fillColor="#1e293b"
-        android:pathData="M54,12C30.8,12 12,30.8 12,54C12,77.2 30.8,96 54,96C77.2,96 96,77.2 96,54C96,30.8 77.2,12 54,12Z" />
-
-    <!-- Plus sign 1 (larger top right) -->
+        android:strokeColor="#00E676"
+        android:strokeWidth="3.5"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M44,28 H64 C66.2,28 68,29.8 68,32 V78 C68,80.2 66.2,82 64,82 H44 C41.8,82 40,80.2 40,78 V32 C40,29.8 41.8,28 44,28 Z" />
+    
+    <!-- Battery Cap -->
     <path
-        android:fillColor="#fbbf24"
-        android:strokeColor="#0f172a"
-        android:strokeWidth="1.5"
-        android:pathData="M69,30 h6 v-6 h2 v6 h6 v2 h-6 v6 h-2 v-6 h-6 Z" />
-
-    <!-- Plus sign 2 (smaller top right) -->
+        android:fillColor="#00E676"
+        android:pathData="M49,22 H59 C60.1,22 61,22.9 61,24 V28 H47 V24 C47,22.9 47.9,22 49,22 Z" />
+        
+    <!-- Full Charge Green Bar at the Bottom -->
     <path
-        android:fillColor="#fbbf24"
-        android:strokeColor="#0f172a"
-        android:strokeWidth="1.2"
-        android:pathData="M81,42 h4 v-4 h1.5 v4 h4 v1.5 h-4 v4 h-1.5 v-4 h-4 Z" />
-
-    <!-- Battery Top Cap -->
+        android:fillColor="#00E676"
+        android:pathData="M44,72 H64 V78 C64,79.1 63.1,80 62,80 H46 C44.9,80 44,79.1 44,78 Z" />
+    
+    <!-- Center Lightning Bolt (Yellow / Gold) -->
     <path
-        android:fillColor="#0f172a"
-        android:strokeColor="#0f172a"
-        android:strokeWidth="1.6"
-        android:pathData="M43,26 h14 c1.5,0 2.5,1 2.5,2.5 v2.5 h-19 v-2.5 c0,-1.5 1,-2.5 2.5,-2.5 Z" />
-
-    <!-- Battery main body outline and white/gray body fill -->
-    <path
-        android:fillColor="#e2e8f0"
-        android:strokeColor="#0f172a"
-        android:strokeWidth="2.5"
-        android:pathData="M34,31 h32 a4,4 0,0,1 4,4 v46 a4,4 0,0,1 -4,4 h-32 a4,4 0,0,1 -4,-4 v-46 a4,4 0,0,1 4,-4 Z" />
-
-    <!-- Battery green energy level at the bottom -->
-    <path
-        android:fillColor="#10b981"
-        android:strokeColor="#0f172a"
-        android:strokeWidth="2.2"
-        android:pathData="M33,61 h34 v20 a2,2 0,0,1 -2,2 h-30 a2,2 0,0,1 -2,-2 Z" />
-
-    <!-- Bright yellow Bold Lightning Bolt inside battery -->
-    <path
-        android:fillColor="#fbbf24"
-        android:strokeColor="#0f1712"
-        android:strokeWidth="1.6"
-        android:pathData="M52,35 L40,51 L48,51 L44,61 L56,45 L48,45 Z" />
-
-    <!-- Large overlap Clock (Mustard yellow circular) -->
-    <path
-        android:fillColor="#f59e0b"
-        android:strokeColor="#0f172a"
-        android:strokeWidth="2.5"
-        android:pathData="M68,52 A17,17 0,1,1 68,86 A17,17 0,1,1 68,52 Z" />
-
-    <!-- Clock Center White Pin -->
-    <path
-        android:fillColor="#ffffff"
-        android:strokeColor="#0f172a"
-        android:strokeWidth="1.5"
-        android:pathData="M68,66 A3,3 0,1,1 68,72 A3,3 0,1,1 68,66 Z" />
-
-    <!-- Clock Hour Hand (Pointing roughly down-to-right) -->
-    <path
-        android:strokeColor="#0f172a"
-        android:strokeWidth="2.5"
-        android:pathData="M68,69 L76,75" />
-
-    <!-- Clock Minute Hand (Pointing vertical up) -->
-    <path
-        android:strokeColor="#0f172a"
-        android:strokeWidth="2.5"
-        android:pathData="M68,69 L68,58" />
+        android:fillColor="#FFD600"
+        android:pathData="M56,36 L46,55 H54 L52,70 L62,51 H54 Z" />
 
 </vector>
