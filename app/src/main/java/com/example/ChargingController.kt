@@ -65,9 +65,23 @@ object ChargingController {
     var cycleCount = 2079
         private set
 
+    private val lastWrittenValues = java.util.concurrent.ConcurrentHashMap<String, String>()
+
+    private fun writeNodeValueIfChanged(nodeName: String, value: String): Boolean {
+        if (lastWrittenValues[nodeName] == value) {
+            return false // Match cached state: skip writing sysfs and duplicate terminal logging
+        }
+        val success = ShellUtils.writeNodeValue(nodeName, value)
+        if (success) {
+            lastWrittenValues[nodeName] = value
+        }
+        return success
+    }
+
     fun startDaemon(context: Context) {
         daemonJob?.cancel()
         telemetryJob?.cancel()
+        lastWrittenValues.clear() // Force refreshing all state checks
 
         // Sync initial values from sysfs
         syncConfigFromNodes()
@@ -99,18 +113,21 @@ object ChargingController {
 
     fun setServiceActive(active: Boolean) {
         _isServiceActive.value = active
+        lastWrittenValues.clear() // Force write fresh values on state shift
         // Apply instantly
         scope.launch { runControlLogic() }
     }
 
     fun setChargingLimit(limit: Int) {
         _chargingLimit.value = limit
-        ShellUtils.writeNodeValue("charge_control_limit_max", limit.toString())
+        lastWrittenValues.clear() // Force write fresh values on state shift
+        writeNodeValueIfChanged("charge_control_limit_max", limit.toString())
         scope.launch { runControlLogic() }
     }
 
     fun setBypassMode(active: Boolean) {
         _isBypassMode.value = active
+        lastWrittenValues.clear() // Force write fresh values on state shift
         scope.launch { runControlLogic() }
     }
 
@@ -147,8 +164,8 @@ object ChargingController {
     private fun runControlLogic() {
         if (!_isServiceActive.value) {
             // Service INACTIVE: Restore standard charging parameters (turn on charging, disable input suspend)
-            ShellUtils.writeNodeValue("charging_enabled", "1")
-            ShellUtils.writeNodeValue("input_suspend", "0")
+            writeNodeValueIfChanged("charging_enabled", "1")
+            writeNodeValueIfChanged("input_suspend", "0")
             return
         }
 
@@ -160,8 +177,8 @@ object ChargingController {
 
         // Safety Cut-off: if temperatures exceed 48°C and thermal cutoff is enabled, forcefully cut off charging
         if (thermalCutoff && temp >= 48.0f) {
-            ShellUtils.writeNodeValue("charging_enabled", "0")
-            ShellUtils.writeNodeValue("input_suspend", "1")
+            writeNodeValueIfChanged("charging_enabled", "0")
+            writeNodeValueIfChanged("input_suspend", "1")
             Log.w(TAG, "Thermal limit triggered ($temp°C). Suspending charging parameters!")
             return
         }
@@ -169,24 +186,24 @@ object ChargingController {
         // Logic check
         if (bypass) {
             // Bypass Mode IS FORCED ON: Override the max charge current to 4000mA and bypass thermal throttling limits!
-            ShellUtils.writeNodeValue("charging_enabled", "1")
-            ShellUtils.writeNodeValue("input_suspend", "0")
-            ShellUtils.writeNodeValue("fast_charge", "1")
-            ShellUtils.writeNodeValue("charge_current_max", "4000000") // 4000mA (Bypass)
+            writeNodeValueIfChanged("charging_enabled", "1")
+            writeNodeValueIfChanged("input_suspend", "0")
+            writeNodeValueIfChanged("fast_charge", "1")
+            writeNodeValueIfChanged("charge_current_max", "4000000") // 4000mA (Bypass)
         } else {
             // Bypass Mode disabled: Restore standard current limits
-            ShellUtils.writeNodeValue("fast_charge", "0")
-            ShellUtils.writeNodeValue("charge_current_max", "2840000") // 2840mA (Standard)
+            writeNodeValueIfChanged("fast_charge", "0")
+            writeNodeValueIfChanged("charge_current_max", "2840000") // 2840mA (Standard)
 
             // Evaluated limit checkpoint
             if (level >= limit) {
                 // Limit reached. Suspend charging (act like bypass mode is engaged automatically at limit)
-                ShellUtils.writeNodeValue("charging_enabled", "0")
-                ShellUtils.writeNodeValue("input_suspend", "1")
+                writeNodeValueIfChanged("charging_enabled", "0")
+                writeNodeValueIfChanged("input_suspend", "1")
             } else {
                 // If it's below limit, make sure standard charging is active! (Fixes non-responsive OFF button bug)
-                ShellUtils.writeNodeValue("charging_enabled", "1")
-                ShellUtils.writeNodeValue("input_suspend", "0")
+                writeNodeValueIfChanged("charging_enabled", "1")
+                writeNodeValueIfChanged("input_suspend", "0")
             }
         }
     }
