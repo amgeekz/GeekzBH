@@ -82,15 +82,49 @@ object ShellUtils {
     }
 
     private fun writeRealNode(nodeName: String, value: String): Boolean {
-        val nodePath = getRealNodePath(nodeName) ?: return false
-        val cmd = "setenforce 0 2>/dev/null; chmod 666 $nodePath 2>/dev/null; echo $value > $nodePath"
-        val result = executeCmdSync(cmd, useRoot = true)
-        return !result.isError
+        val possiblePaths = getRealNodePathsList(nodeName)
+        if (possiblePaths.isEmpty()) return false
+        
+        var successMessage = ""
+        var successCount = 0
+        var lastError: CommandResult? = null
+        
+        for (path in possiblePaths) {
+            if (File(path).exists()) {
+                val cmd = "setenforce 0 2>/dev/null; chmod 666 $path 2>/dev/null; echo $value > $path"
+                val result = executeCmdSync(cmd, useRoot = true, logToConsole = false)
+                if (!result.isError) {
+                    successCount++
+                    successMessage = "Successfully wrote $value to $path"
+                } else {
+                    lastError = result
+                }
+            }
+        }
+        
+        if (successCount > 0) {
+            logLocal("SYSFS_WRITE", "Success: $successMessage", false)
+            return true
+        } else {
+            if (lastError != null) {
+                val cleanResult = CommandResult(nodeName, lastError.output, true)
+                logCommand(cleanResult, true)
+            }
+            return false
+        }
     }
 
     private fun getRealNodePath(nodeName: String): String? {
+        val possiblePaths = getRealNodePathsList(nodeName)
+        for (path in possiblePaths) {
+            if (File(path).exists()) return path
+        }
+        return possiblePaths.firstOrNull()
+    }
+
+    private fun getRealNodePathsList(nodeName: String): List<String> {
         val baseBattery = "/sys/class/power_supply/battery"
-        val possiblePaths = when (nodeName) {
+        return when (nodeName) {
             "charging_enabled" -> listOf("$baseBattery/charging_enabled", "$baseBattery/battery_charging_enabled", "$baseBattery/charge_enabled")
             "input_suspend" -> listOf("$baseBattery/input_suspend", "$baseBattery/charging_suspend")
             "charge_control_limit_max" -> listOf("$baseBattery/charge_control_limit_max", "$baseBattery/charge_control_limit")
@@ -102,13 +136,21 @@ object ShellUtils {
             "technology" -> listOf("$baseBattery/technology")
             "status" -> listOf("$baseBattery/status")
             "cycle_count" -> listOf("$baseBattery/cycle_count")
+            "charge_current_max" -> listOf(
+                "$baseBattery/constant_charge_current_max",
+                "$baseBattery/charge_current_max",
+                "$baseBattery/current_max",
+                "$baseBattery/input_current_limit",
+                "/sys/class/power_supply/main/constant_charge_current_max",
+                "/sys/class/power_supply/main/current_max"
+            )
+            "fast_charge" -> listOf(
+                "$baseBattery/fast_charge",
+                "$baseBattery/charge_pump_enable",
+                "$baseBattery/boost_current"
+            )
             else -> listOf("$baseBattery/$nodeName")
         }
-        
-        for (path in possiblePaths) {
-            if (File(path).exists()) return path
-        }
-        return possiblePaths.firstOrNull()
     }
 
     fun executeCmdSync(command: String, useRoot: Boolean = true, logToConsole: Boolean = true): CommandResult {
