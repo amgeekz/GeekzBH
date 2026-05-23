@@ -217,8 +217,12 @@ object ChargingController {
             crnt /= 1000 // Convert uA to mA if in microamperes
         }
 
-        val isCharging = rawStatus.lowercase().contains("charging") || 
-                         rawStatus.lowercase().contains("full") || 
+        val rawStatusLower = rawStatus.lowercase()
+        val isCharging = (rawStatusLower.contains("charging") && 
+                          !rawStatusLower.contains("discharging") && 
+                          !rawStatusLower.contains("not charging")) || 
+                         rawStatusLower.contains("full") || 
+                         rawStatusLower.contains("boost") ||
                          _isBypassMode.value
 
         if (isCharging) {
@@ -252,7 +256,7 @@ object ChargingController {
         _batteryStatus.value = if (_isBypassMode.value) "Bypass Mode Boost" else rawStatus
 
         // 7. Power Generation Calculations
-        _powerUsageWatts.value = Math.abs(_batteryCurrent.value * _batteryVoltage.value) / 1000000.0f
+        _powerUsageWatts.value = (_batteryCurrent.value * _batteryVoltage.value) / 1000000.0f
 
         // 8. Static / semi-static parameters from real intents
         updateSemiStaticSpecs(context, rawStatus, cycleStr)

@@ -75,11 +75,15 @@ fun StatusScreen() {
             isCharging -> "FAST CHARGING ACTIVE"
             else -> "DISCHARGING"
         }
-        val statusColor = if (activeBypass) NeoPink else (if (isCharging) NeoGreen else SoftRed)
+        // Use fully opaque colors to prevent the solid shadow from shining through!
+        val cardBgColor = if (activeBypass) Color(0xFFFFECEF) else if (isCharging) Color(0xFFE2F9EE) else Color(0xFFFFF2F2)
+        val cardTextColor = if (activeBypass) Color(0xFFD81B60) else if (isCharging) NeoGreen else Color(0xFFDC2626)
+        val cardBorderColor = if (activeBypass) NeoPink else if (isCharging) NeoGreen else SoftRed
 
         NeobrutalistCard(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-            containerColor = statusColor.copy(alpha = 0.15f),
+            containerColor = cardBgColor,
+            borderColor = cardBorderColor,
             shadowOffset = 2.dp,
             borderWidth = 1.5.dp
         ) {
@@ -89,7 +93,7 @@ fun StatusScreen() {
             ) {
                 Text(
                     text = displayStatus,
-                    color = NeoDark,
+                    color = cardTextColor,
                     fontSize = 12.sp,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.ExtraBold,
@@ -354,9 +358,12 @@ fun BatteryLiquidGauge(level: Int, modifier: Modifier = Modifier) {
         animationSpec = tween(1200, easing = FastOutSlowInEasing)
     )
 
-    val isCharging = status.lowercase().contains("charging") || 
-                     status.lowercase().contains("boost") || 
-                     status.lowercase().contains("full")
+    val statusLower = status.lowercase()
+    val isCharging = (statusLower.contains("charging") && 
+                      !statusLower.contains("discharging") && 
+                      !statusLower.contains("not charging")) || 
+                     statusLower.contains("boost") || 
+                     statusLower.contains("full")
 
     // Infinite wave shift transition to create liquid wave animation ("Battery Level tidak ada animasi nya")
     val infiniteTransition = rememberInfiniteTransition(label = "liquid_wave")
@@ -468,7 +475,7 @@ fun BatteryLiquidGauge(level: Int, modifier: Modifier = Modifier) {
             val activeBypassed = ChargingController.isBypassMode.collectAsState().value
             Text(
                 text = if (activeBypassed) "ACTIVE BYPASS BOOST⚡" else (if (isCharging) "CHARGING⚡" else "DISCHARGING🔋"),
-                color = NeoDark,
+                color = if (activeBypassed) NeoPink else if (isCharging) NeoGreen else NeoDark,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Black,
