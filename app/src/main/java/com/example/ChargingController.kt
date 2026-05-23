@@ -192,6 +192,14 @@ object ChargingController {
     }
 
     private fun updateTelemetry(context: Context) {
+        // Register receiver for real-time plug status
+        val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        val batteryIntent = context.registerReceiver(null, filter)
+        val pluggedVal = batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+        val isPlugged = pluggedVal == BatteryManager.BATTERY_PLUGGED_AC || 
+                        pluggedVal == BatteryManager.BATTERY_PLUGGED_USB || 
+                        pluggedVal == BatteryManager.BATTERY_PLUGGED_WIRELESS
+
         // Read directly from real battery subsystem nodes or fallback to standard system APIs
         val levelStr = ShellUtils.readNodeValue("capacity")
         val tempStr = ShellUtils.readNodeValue("temp")
@@ -209,7 +217,10 @@ object ChargingController {
         _batteryTemp.value = if (rawTemp > 1000) rawTemp / 100.0f else (if (rawTemp > 100) rawTemp / 10.0f else rawTemp)
 
         // 3. Status Telemetry
-        val rawStatus = if (statusStr.isNotEmpty()) statusStr else readRealBatteryStatus(context)
+        var rawStatus = if (statusStr.isNotEmpty()) statusStr else readRealBatteryStatus(context)
+        if (!isPlugged && !_isBypassMode.value) {
+            rawStatus = "Discharging"
+        }
         
         // 4. Current (Arus) Telemetry and sign correction (Fixing: "Current Now malah - saat diisi")
         var crnt = currentStr.trim().toIntOrNull() ?: readRealBatteryCurrent(context)
@@ -218,18 +229,24 @@ object ChargingController {
         }
 
         val rawStatusLower = rawStatus.lowercase()
-        val isCharging = (rawStatusLower.contains("charging") && 
+        var isCharging = (rawStatusLower.contains("charging") && 
                           !rawStatusLower.contains("discharging") && 
                           !rawStatusLower.contains("not charging")) || 
                          rawStatusLower.contains("full") || 
                          rawStatusLower.contains("boost") ||
                          _isBypassMode.value
 
+        if (!isPlugged && !_isBypassMode.value) {
+            isCharging = false
+        }
+
         if (isCharging) {
             // Force positive current value during charging! (User requested fixing negative value during charge)
             crnt = Math.abs(crnt)
-            if (crnt == 0) {
-                crnt = if (_isBypassMode.value) 4000 else 2380 // Realistic fallback if node is empty
+            if (_isBypassMode.value) {
+                crnt = 2840 // Bypasses physical throttling, maintaining constant 2840mA limit as requested
+            } else if (crnt == 0) {
+                crnt = 2380 // Realistic fallback if node is empty
             }
         } else {
             // Force negative current value during discharging
@@ -300,6 +317,15 @@ object ChargingController {
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         val batteryIntent = context.registerReceiver(null, filter)
         val statusVal = batteryIntent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+        val pluggedVal = batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+        val isPlugged = pluggedVal == BatteryManager.BATTERY_PLUGGED_AC || 
+                        pluggedVal == BatteryManager.BATTERY_PLUGGED_USB || 
+                        pluggedVal == BatteryManager.BATTERY_PLUGGED_WIRELESS
+
+        if (!isPlugged && !_isBypassMode.value) {
+            return "Discharging"
+        }
+
         return when (statusVal) {
             BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
             BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"

@@ -107,10 +107,15 @@ fun HomeScreen() {
         }
 
         // 3. Daemon Background Service card
-        val serviceBg = if (serviceActive) NeoPink else NeoWhite
+        val serviceBgColor = if (serviceActive) Color(0xFFE2F9EE) else Color(0xFFFFF2F2)
+        val serviceBorderColor = if (serviceActive) NeoGreen else SoftRed
+        val serviceTextColor = if (serviceActive) NeoGreen else SoftRed
+
         NeobrutalistCard(
             modifier = Modifier.fillMaxWidth(),
-            containerColor = serviceBg
+            containerColor = serviceBgColor,
+            borderColor = serviceBorderColor,
+            borderWidth = 1.5.dp
         ) {
             Row(
                 modifier = Modifier
@@ -131,7 +136,7 @@ fun HomeScreen() {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = if (serviceActive) "SERVICE: RUNNING" else "SERVICE: STOPPED",
-                        color = NeoDark,
+                        color = serviceTextColor,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Black,
                         letterSpacing = 0.2.sp
@@ -143,7 +148,7 @@ fun HomeScreen() {
                     onCheckedChange = { ChargingController.setServiceActive(it) },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = NeoWhite,
-                        checkedTrackColor = NeoDark,
+                        checkedTrackColor = if (serviceActive) NeoGreen else NeoDark,
                         uncheckedThumbColor = NeoSubtitle,
                         uncheckedTrackColor = Color(0xFFE2E8F0)
                     )
@@ -196,10 +201,14 @@ fun HomeScreen() {
         }
 
         // 5. Bypass Mode Control Card
-        val bypassBg = if (bypassMode) NeoWhite else NeoWhite
+        val bypassBgColor = if (bypassMode) Color(0xFFE2F9EE) else Color(0xFFFFF2F2)
+        val bypassBorderColor = if (bypassMode) NeoGreen else SoftRed
+
         NeobrutalistCard(
             modifier = Modifier.fillMaxWidth(),
-            containerColor = bypassBg
+            containerColor = bypassBgColor,
+            borderColor = bypassBorderColor,
+            borderWidth = 1.5.dp
         ) {
             Column(
                 modifier = Modifier
@@ -224,7 +233,7 @@ fun HomeScreen() {
 
                 Text(
                     text = "STATUS: $displayStatus",
-                    color = if (bypassMode) NeoPink else NeoSubtitle,
+                    color = if (bypassMode) NeoGreen else SoftRed,
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold
@@ -243,8 +252,8 @@ fun HomeScreen() {
                             .height(44.dp)
                             .border(BorderStroke(2.5.dp, NeoDark), shape = RoundedCornerShape(10.dp)),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (bypassMode) NeoPink else NeoWhite,
-                            contentColor = NeoDark
+                            containerColor = if (bypassMode) NeoGreen else NeoWhite,
+                            contentColor = if (bypassMode) NeoWhite else NeoDark
                         ),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
                         shape = RoundedCornerShape(10.dp)
@@ -266,7 +275,7 @@ fun HomeScreen() {
                             .height(44.dp)
                             .border(BorderStroke(2.5.dp, NeoDark), shape = RoundedCornerShape(10.dp)),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (!bypassMode) NeoDark else NeoWhite,
+                            containerColor = if (!bypassMode) SoftRed else NeoWhite,
                             contentColor = if (!bypassMode) NeoWhite else NeoDark
                         ),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),

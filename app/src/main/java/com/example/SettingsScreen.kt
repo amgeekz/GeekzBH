@@ -145,9 +145,14 @@ fun SettingsSwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val cardBgColor = if (checked) Color(0xFFE2F9EE) else Color(0xFFFFF2F2)
+    val cardBorderColor = if (checked) NeoGreen else SoftRed
+
     NeobrutalistCard(
         modifier = Modifier.fillMaxWidth(),
-        containerColor = if (checked) NeoPink.copy(alpha = 0.08f) else NeoWhite,
+        containerColor = cardBgColor,
+        borderColor = cardBorderColor,
+        borderWidth = 1.5.dp,
         shadowOffset = 3.dp
     ) {
         Row(
@@ -178,7 +183,7 @@ fun SettingsSwitchRow(
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = NeoWhite,
-                    checkedTrackColor = NeoDark,
+                    checkedTrackColor = if (checked) NeoGreen else NeoDark,
                     uncheckedThumbColor = NeoSubtitle,
                     uncheckedTrackColor = Color(0xFFE2E8F0)
                 )
