@@ -243,10 +243,8 @@ object ChargingController {
         if (isCharging) {
             // Force positive current value during charging! (User requested fixing negative value during charge)
             crnt = Math.abs(crnt)
-            if (_isBypassMode.value) {
-                crnt = 2840 // Bypasses physical throttling, maintaining constant 2840mA limit as requested
-            } else if (crnt == 0) {
-                crnt = 2380 // Realistic fallback if node is empty
+            if (crnt == 0) {
+                crnt = if (_isBypassMode.value) 2840 else 2380 // Only use fallback if sensory node is empty/0
             }
         } else {
             // Force negative current value during discharging
