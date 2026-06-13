@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 
 class ChargingService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var serviceStartTime: Long = 0L
 
     companion object {
         private const val TAG = "ChargingService"
@@ -44,6 +45,7 @@ class ChargingService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        serviceStartTime = System.currentTimeMillis()
         createNotificationChannel()
         
         // Ensure the charging daemon is running
@@ -129,6 +131,9 @@ class ChargingService : Service() {
             .setSmallIcon(R.drawable.ic_charging_notification) // Monochrome vector suitable for status bar
             .setContentIntent(pendingIntent)
             .setOngoing(true)
+            .setWhen(serviceStartTime)
+            .setShowWhen(true)
+            .setUsesChronometer(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build()
     }
