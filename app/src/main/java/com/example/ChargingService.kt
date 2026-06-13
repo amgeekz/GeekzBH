@@ -122,18 +122,27 @@ class ChargingService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
+        val elapsedMs = if (serviceStartTime > 0L) System.currentTimeMillis() - serviceStartTime else 0L
+        val totalSec = elapsedMs / 1000
+        val hrs = totalSec / 3600
+        val mins = (totalSec % 3600) / 60
+        val secs = totalSec % 60
+        val durationStr = if (hrs > 0) {
+            String.format("%02d:%02d:%02d", hrs, mins, secs)
+        } else {
+            String.format("%02d:%02d", mins, secs)
+        }
+
         val title = "Battery Status: ${data.level}% (${data.status})"
         val content = "${data.temp}°C | ${data.voltage} mV | ${data.current} mA"
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(content)
+            .setSubText("Durasi Aktif: $durationStr")
             .setSmallIcon(R.drawable.ic_charging_notification) // Monochrome vector suitable for status bar
             .setContentIntent(pendingIntent)
             .setOngoing(true)
-            .setWhen(serviceStartTime)
-            .setShowWhen(true)
-            .setUsesChronometer(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build()
     }
